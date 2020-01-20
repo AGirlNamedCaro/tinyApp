@@ -19,13 +19,27 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req,res) => {
   console.log(req.body);
-  res.send('ok');
+  const request = req.body.longURL;
+  const randomString = generateRandomString();
+  urlDatabase[randomString] = request;
+  res.redirect(302, `/urls/${randomString}`);
 })
 
 app.get("/urls/:shortURL", (req,res) => {
-  let templateVars = {shortURL: req.params.shortURL, longURL: req.params.longURL};
+  let templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+
   res.render("urls_show", templateVars);
 });
+
+app.get("/u/:shortURL", (req, res) => {
+  // const longURL = ...
+  
+  const longURL = urlDatabase[req.params.shortURL];
+  console.log(longURL);
+  res.redirect(longURL);
+});
+
+
 
 
 const urlDatabase = {
@@ -50,10 +64,13 @@ app.listen(PORT, () => {
 })
 
 
-
-
 function generateRandomString () {
   //Create a function that generates a string made of random characters
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const characterLength = 6;
+  for(let i = 0; i < characterLength; i++) {
+    result += characters.charAt(Math.floor(Math.random()* characterLength));
+  }
+  return result;
 }
