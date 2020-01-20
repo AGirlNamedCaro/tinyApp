@@ -5,7 +5,11 @@ const PORT = 8080;
 
 //EJS is a template engine
 app.set('view engine', 'ejs');
-
+//Sending data to urls_index.ejs
+app.get("/urls", (req,res) => {
+  let templateVars = {urls: urlDatabase};
+  res.render("urls_index", templateVars);
+})
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
