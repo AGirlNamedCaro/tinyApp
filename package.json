@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/AGirlNamedCaro/tinyApp/issues"
   },
-  "homepage": "https://github.com/AGirlNamedCaro/tinyApp#readme"
+  "homepage": "https://github.com/AGirlNamedCaro/tinyApp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
