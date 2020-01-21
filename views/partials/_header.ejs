@@ -11,15 +11,18 @@
 
 
         <% if(username){ %>
-          <form method="POST" action="/logout" class='form-inline ml-5' >
+          <form method="POST" action="/logout" class='form-inline ml-5 pull-right' >
           <h7>Welcome! <%= username %></h7>
           <button type="submit" class="btn btn-secondary ml-1">Logout</button>
         </form>
-        <% } else{ %>  
+        <% } else{ %>
+          
           <form method="POST" action="/login" class='form-inline ml-5' >
-            <input type="login" name='username' class="form-control" id="username" placeholder="username">
-            <button type="submit" class="btn btn-secondary ml-1">Login</button>
+            <input type="login" name='username' class="form-control mr-sm-2 " id="username" placeholder="username">
+            <button type="submit" class="btn btn-secondary my-2 my-sm-0 ">Login</button>
           </form>
+       
+      </div>
        <% } %>
 
 
