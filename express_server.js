@@ -26,10 +26,24 @@ app.post("/urls", (req,res) => {
 })
 
 app.post('/urls/:shortURL/delete', (req,res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect(302,'/urls');
+  delete  urlDatabase[req.params.shortURL];
+  res.redirect(302,`/urls/`);
   
 })
+
+app.post('/urls/:id', (req,res) => {
+  const id = req.params.id;
+  console.log(id);
+  res.redirect(302,`/urls/${id}`);
+})
+
+app.post('/urls/:shortURL/edit', (req,res) => {
+  urlDatabase[req.params.shortURL] = req.body.longURL;
+  
+  res.redirect(302, `/urls/`)
+})
+
+
 
 app.get("/urls/:shortURL", (req,res) => {
   let templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
