@@ -66,6 +66,28 @@ app.post('/login', (req,res) => {
 })
 
 
+app.post('/logout', (req,res) => {
+  const username = req.body.username;
+  res.clearCookie('username',username)
+  let templateVars = {
+    username: req.body.username,
+    urls: urlDatabase
+  };
+
+  console.log(username);
+  
+  res.render("urls_index", templateVars);
+  
+})
+
+
+
+
+
+
+
+
+
 app.get("/urls/:shortURL", (req,res) => {
   let templateVars = {
     shortURL: req.params.shortURL, 
