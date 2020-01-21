@@ -51,17 +51,19 @@ app.post('/urls/:shortURL/edit', (req,res) => {
   res.redirect(302, `/urls/`)
 })
 
-// app.post('/login', (req,res) => {
-//   const username = req.body.username;
-//   res.cookie('username',username)
-//   let templateVars = {
-//     username: req.body.username,
-//     urls: urlDatabase
-//   };
+app.post('/login', (req,res) => {
+  const username = req.body.username;
+  res.cookie('username',username)
+  let templateVars = {
+    username: req.body.username,
+    urls: urlDatabase
+  };
+
+  console.log(username);
   
-//   res.render("urls_index", templateVars);
+  res.render("urls_index", templateVars);
   
-// })
+})
 
 
 app.get("/urls/:shortURL", (req,res) => {
