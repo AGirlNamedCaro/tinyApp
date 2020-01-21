@@ -9,27 +9,25 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
 
-
-        <% if(username){ %>
-          <form method="POST" action="/logout" class='form-inline ml-5 pull-right' >
-          <h7>Welcome! <%= username %></h7>
-          <button type="submit" class="btn btn-secondary ml-1">Logout</button>
-        </form>
-        <% } else{ %>
-          
-          <form method="POST" action="/login" class='form-inline ml-5' >
-            <input type="login" name='username' class="form-control mr-sm-2 " id="username" placeholder="username">
-            <button type="submit" class="btn btn-secondary my-2 my-sm-0 ">Login</button>
-          </form>
-       
-      </div>
-       <% } %>
-
-
        
          
         
       </div>
     </div>
+    <% if(username){ %>
+      <form method="POST" action="/logout" class='form-inline ml-5 pull-right' >
+      <h7>Welcome! <%= username %></h7>
+      <button type="submit" class="btn btn-secondary ml-1">Logout</button>
+    </form>
+    <% } else{ %>
+      
+      <form method="POST" action="/login" class='form-inline ml-5' >
+        <input type="login" name='username' class="form-control mr-sm-2 " id="username" placeholder="username">
+        <button type="submit" class="btn btn-secondary my-2 my-sm-0 ">Login</button>
+      </form>
+
+  </div>
+   <% } %>
+
   </nav>
 </header>
