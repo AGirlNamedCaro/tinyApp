@@ -25,6 +25,12 @@ app.post("/urls", (req,res) => {
   res.redirect(302, `/urls/${randomString}`);
 })
 
+app.post('/urls/:shortURL/delete', (req,res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect(302,'/urls');
+  
+})
+
 app.get("/urls/:shortURL", (req,res) => {
   let templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
 
@@ -72,5 +78,5 @@ function generateRandomString () {
   for(let i = 0; i < characterLength; i++) {
     result += characters.charAt(Math.floor(Math.random()* characterLength));
   }
-  return result;
+  return result.toLocaleLowerCase();
 }
