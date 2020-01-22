@@ -33,7 +33,12 @@ app.get("/urls", (req, res) => {
   })
 //Displays form where the user will submit their long url in order to create a new tiny one
 app.get("/urls/new", (req,res) => {
-  res.render('urls_new');
+  let templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies["username"]
+  };
+  res.render('urls_new', templateVars);
 })
 
 //This route will take you to the longURL website upon shortURL click
@@ -72,13 +77,6 @@ app.post('/logout', (req,res) => {
   res.redirect('/urls');
 })
 
-
-
-
-
-
-
-
 //Template rendering
   //Displays the long url and the short url
 app.get("/urls/:shortURL", (req,res) => {
@@ -89,6 +87,17 @@ app.get("/urls/:shortURL", (req,res) => {
   };
 
   res.render('urls_show', templateVars);
+})
+
+//Displays Registration page
+app.get('/register', (req,res) => {
+  let templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies["username"]
+  };
+
+  res.render('registration', templateVars);
 })
 
 
