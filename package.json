@@ -1,23 +1,15 @@
 {
-  "name": "tinyApp",
+  "name": "tinyApp2",
   "version": "1.0.0",
-  "description": "",
+  "description": "This app is going to take in input from the user and convert the long URL into a smaller version of it. The user will be able to edit, delete, and log in/logout into the app",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./node_modules/.bin/nodemon -L express_server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AGirlNamedCaro/tinyApp.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/AGirlNamedCaro/tinyApp/issues"
-  },
-  "homepage": "https://github.com/AGirlNamedCaro/tinyApp#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",

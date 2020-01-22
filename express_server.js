@@ -1,140 +1,111 @@
 const express = require('express');
 const app = express();
 const PORT = 8080;
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
+const { generateRandomString } = require('./functions/generateRandomString')
+const cookieParser = require('cookie-parser')
 
+app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-
-//EJS is a template engine
-app.set('view engine', 'ejs');
-app.use(bodyParser());
-//Adding a route for this data
-app.get("/urls", (req,res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    // username : req.cookies.username
-  };
-  res.render("urls_index", templateVars);
-});
-
-app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    // username : req.cookies.username
-  };
-  res.render("urls_new", templateVars);
-});
-
-app.post("/urls", (req,res) => {
-  console.log(req.body);
-  const request = req.body.longURL;
-  const randomString = generateRandomString();
-  urlDatabase[randomString] = request;
-  res.redirect(302, `/urls/${randomString}`);
-})
-
-app.post('/urls/:shortURL/delete', (req,res) => {
-  delete  urlDatabase[req.params.shortURL];
-  res.redirect(302,`/urls/`);
-  
-})
-
-app.post('/urls/:id', (req,res) => {
-  const id = req.params.id;
-  console.log(id);
-  res.redirect(302,`/urls/${id}`);
-})
-
-app.post('/urls/:shortURL/edit', (req,res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
-  
-  res.redirect(302, `/urls/`)
-})
-
-app.post('/login', (req,res) => {
-  const username = req.body.username;
-  res.cookie('username',username)
-  let templateVars = {
-    username: req.body.username,
-    urls: urlDatabase
-  };
-
-  console.log(username);
-  
-  res.render("urls_index", templateVars);
-  
-})
-
-
-app.post('/logout', (req,res) => {
-  const username = req.body.username;
-  res.clearCookie('username',username)
-  let templateVars = {
-    username: req.body.username,
-    urls: urlDatabase
-  };
-
-  console.log(username);
-  
-  res.render("urls_index", templateVars);
-  
-})
-
-
-
-
-
-
-
-
-
-app.get("/urls/:shortURL", (req,res) => {
-  let templateVars = {
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
-    // username : req.cookies.username};
-  }
-  res.render("urls_show", templateVars);
-});
-
-app.get("/u/:shortURL", (req, res) => {
-  // const longURL = ...
-  
-  const longURL = urlDatabase[req.params.shortURL];
-  console.log(longURL);
-  res.redirect(longURL);
-});
-
+app.use(cookieParser())
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
-}
+};
 
-app.get("/", (req,res) => {
-  res.send('Hello!');
+//ROUTES
+  //Main URLS page
+app.get("/urls", (req, res) => {
+  let templateVars = { 
+    urls: urlDatabase,
+    username: req.cookies["username"]
+   };
+  res.render("urls_index", templateVars);
 });
+  //Post from urls_new's form onto /urls
+  app.post('/urls', (req, res) => {
+    const longURL = req.body.longURL;
+    const shortURL = generateRandomString();
 
-app.get("/urls.json", (req,res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req,res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>")
+    urlDatabase[shortURL] = longURL;
+    res.redirect(`urls/${shortURL}`);
+  })
+//Displays form where the user will submit their long url in order to create a new tiny one
+app.get("/urls/new", (req,res) => {
+  res.render('urls_new');
 })
+
+//This route will take you to the longURL website upon shortURL click
+app.get("/u/:shortURL", (req,res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+})
+
+//This route removes a URL resource from the database
+app.post("/urls/:shortURL/delete", (req,res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
+})
+
+//This route takes the user from url to url/:id through the edit button
+app.post("/urls/:shortURL/", (req,res) => {
+  res.redirect(`/urls/${req.params.shortURL}`)
+})
+
+//This route edits/updates the longURL & redirects to /urls
+app.post('/urls/:shortURL/edit', (req,res) => {
+  urlDatabase[req.params.shortURL] = req.body.longURL;
+  res.redirect('/urls');
+})
+//This route logs the user and sets the cookie
+app.post('/login', (req,res) => {
+  const username = req.body.username;
+  res.cookie('username', username);
+  
+  res.redirect('/urls');
+})
+
+//This route clears the cookie and logs the user out
+app.post('/logout', (req,res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
+})
+
+
+
+
+
+
+
+
+//Template rendering
+  //Displays the long url and the short url
+app.get("/urls/:shortURL", (req,res) => {
+  let templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies["username"]
+  };
+
+  res.render('urls_show', templateVars);
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`App listening on port ${PORT}`);
 })
 
-
-function generateRandomString () {
-  //Create a function that generates a string made of random characters
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  const characterLength = 6;
-  for(let i = 0; i < characterLength; i++) {
-    result += characters.charAt(Math.floor(Math.random()* characterLength));
-  }
-  return result.toLocaleLowerCase();
-}
