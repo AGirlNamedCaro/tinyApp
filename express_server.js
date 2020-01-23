@@ -142,16 +142,19 @@ app.get('/register', (req,res) => {
   const user_id = req.session.user_id
 
   if(user_id) {
-    res.redirect('/urls');
+    return res.redirect('/urls');
+  }
+  else {
+
+    let templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL],
+      user: users[user_id]
+     
+    };
+    return res.render('registration', templateVars);
   }
   
-  let templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
-    user: users[user_id]
-   
-  };
-  res.render('registration', templateVars);
 })
 
 ////// POST REQUEST //////
