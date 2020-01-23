@@ -27,16 +27,7 @@ const urlDatabase = {
 };
 //users start
 const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  }
+  
 }
 
 //ROUTES
@@ -44,10 +35,11 @@ const users = {
 app.get("/urls", (req, res) => {
  
   const user_id = req.session.user_id
-
+ 
+  
   let templateVars = { 
     urls: urlsForUser(user_id,urlDatabase),
-    user: user_id
+    user: users[user_id]
     
    };
   res.render("urls_index", templateVars);
@@ -57,7 +49,6 @@ app.get("/urls", (req, res) => {
     const longURL = req.body.longURL;
     const shortURL = generateRandomString();
     const user_id = req.session.user_id
-
     
     
 
@@ -74,7 +65,7 @@ app.get("/urls/new", (req,res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    user: user_id
+    user: users[user_id]
 
   };
   if(!templateVars['user']) {
@@ -162,7 +153,7 @@ app.get("/urls/:shortURL", (req,res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlsForUser(user_id, urlDatabase)[shortURL],
-    user: user_id
+    user: users[user_id]
   
   };
 
@@ -176,7 +167,7 @@ app.get('/login', (req,res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    user: user_id
+    user: users[user_id]
    
   };
 
@@ -192,7 +183,7 @@ app.get('/register', (req,res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    user: user_id
+    user: users[user_id]
    
   };
 

@@ -6,11 +6,11 @@ const emailLookUp = (email,object) => {
       //else return false
   for(const key in object) {
     if(email === object[key]['email']) {
-      return true
+      return object[key]['id'];
     }
   }
       
-    return false
+    return null
       
 }
 
