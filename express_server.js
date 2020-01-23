@@ -7,7 +7,7 @@ const { emailLookUp } = require('./functions/emailLookUp')
 const { getKeyByValue } = require('./functions/getKeyByValue')
 const { getUserPassword } = require('./functions/getUserPassword')
 const { urlsForUser } = require('./functions/urlsForUser')
-
+const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser')
 
 app.set("view engine", "ejs");
@@ -118,11 +118,12 @@ app.post('/login', (req,res) => {
   
   
   
+  
   if(!user_id) {
     res.status(403).send('Email cannot be found, please register');
   }
 
-  if(password !== currentIdPassword) {
+  if(!bcrypt.compareSync(password,currentIdPassword)) {
     res.status(403).send('Password is wrong, please try again');
   }
 
@@ -199,10 +200,11 @@ app.post('/register', (req,res) => {
         res.status(400).send('Email is already in the database. Please log in instead');
       }
       else {
+        const hashedPassword = bcrypt.hashSync(password,10);
         users[user_id] = {
           id: user_id,
           email: email,
-          password: password
+          password: hashedPassword
         }
         res.cookie('user_id', user_id);
         res.redirect('/urls');
