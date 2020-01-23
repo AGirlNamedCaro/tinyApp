@@ -49,7 +49,10 @@ const users = {
     if(user_id) {
       res.redirect('/urls')
     }
-    res.redirect('/login');
+    else {
+
+      res.redirect('/login');
+    }
   })
     //Main URLS page
 app.get("/urls", (req, res) => {
@@ -75,10 +78,14 @@ app.get("/urls/new", (req,res) => {
     user: users[user_id]
 
   };
+
   if(!templateVars['user']) {
     res.redirect('/login');
   }
-  res.render('urls_new', templateVars);
+  else {
+
+    res.render('urls_new', templateVars);
+  }
 })
 //This route will take you to the longURL website upon shortURL click
 app.get("/u/:shortURL", (req,res) => {

@@ -29,17 +29,22 @@
             <td><%= urls[url] %></td>
             <td>
               <form method="POST" action="/urls/<%= url %>/">
-                <button type="submit" class="btn btn-outline-primary">Edit</button>
+                <button type="submit" class="btn btn-success">Edit</button>
               </form>
             </td>
             <td>
               <form method="POST" action="/urls/<%= url %>/delete">
-                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
               </form>
             </td>
           </tr>
           
         <% } %>
+        <% if(user){ %>
+        <th scope="col"><a href='/urls/new' target="_blank">Create a New Short Link</a></th>
+        <% } else{ %> 
+          <th scope="col"><a href='/login' target="_blank">Log in To Create a New Short Link</a></th>
+          <% } %>
       </tbody>
     </table>
   </main>
