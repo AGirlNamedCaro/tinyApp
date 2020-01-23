@@ -1,3 +1,5 @@
+////GLOBAL VARS /////////
+
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -20,18 +22,36 @@ app.use(cookieSession({
   keys: ["user_id"],
 
 }))
-//Database - start
+////////DATABASES
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
-//users start
+
 const users = { 
-  
+  "aJ48lW": {
+    id: "aJ48lW", 
+    email: "user@example.com", 
+    password: bcrypt.hashSync("purple-monkey-dinosaur",10)
+  },
+  "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: bcrypt.hashSync("dishwasher-funk",10)
+  }
 }
 
-//ROUTES
-  //Main URLS page
+////////ROUTES////////////////
+  ///GET REQUESTS /////////////
+    //Main / page
+  app.get('/', (req,res) => {
+    const user_id = req.session.user_id
+    if(user_id) {
+      res.redirect('/urls')
+    }
+    res.redirect('/login');
+  })
+    //Main URLS page
 app.get("/urls", (req, res) => {
  
   const user_id = req.session.user_id
@@ -44,20 +64,7 @@ app.get("/urls", (req, res) => {
    };
   res.render("urls_index", templateVars);
 });
-  //Post from urls_new's form onto /urls
-  app.post('/urls', (req, res) => {
-    const longURL = req.body.longURL;
-    const shortURL = generateRandomString();
-    const user_id = req.session.user_id
-    
-    
 
-    urlDatabase[shortURL] = {
-      "longURL": longURL,
-      'userID': user_id
-    };
-    res.redirect(`urls/${shortURL}`);
-  })
 //Displays form where the user will submit their long url in order to create a new tiny one
 app.get("/urls/new", (req,res) => {
   const user_id = req.session.user_id
@@ -73,9 +80,6 @@ app.get("/urls/new", (req,res) => {
   }
   res.render('urls_new', templateVars);
 })
-
-
-
 //This route will take you to the longURL website upon shortURL click
 app.get("/u/:shortURL", (req,res) => {
 
@@ -83,81 +87,24 @@ app.get("/u/:shortURL", (req,res) => {
   res.redirect(longURL);
 })
 
-//This route removes a URL resource from the database
-app.post("/urls/:shortURL/delete", (req,res) => {
-  const user_id = req.session.user_id;
-
-  if(user_id) {
-
-    delete urlDatabase[req.params.shortURL];
-  }
-
-  
-  res.redirect('/urls');
-})
-
-//This route takes the user from url to url/:id through the edit button
-app.post("/urls/:shortURL/", (req,res) => {
-  res.redirect(`/urls/${req.params.shortURL}`)
-})
-
-//This route edits/updates the longURL & redirects to /urls
-app.post('/urls/:shortURL/edit', (req,res) => {
-  urlDatabase[req.params.shortURL]["longURL"] = req.body.longURL;
-  
-  
-  res.redirect('/urls');
-})
-//This route logs the user and sets the cookie
-app.post('/login', (req,res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const user_id = getKeyByValue(users,email);
-  const currentIdPassword = getUserPassword(user_id,users);
-  
-  
-  
-  
-  if(!user_id) {
-    res.status(403).send('Email cannot be found, please register');
-  }
-
-  if(!bcrypt.compareSync(password,currentIdPassword)) {
-    res.status(403).send('Password is wrong, please try again');
-  }
-
-  else {
-
-    req.session.user_id = user_id;
-    
-    
-    res.redirect('/urls');
-  }
-  
-})
-
-
-//This route clears the cookie and logs the user out
-app.post('/logout', (req,res) => {
-  res.clearCookie('session');
-  
-  res.redirect('/urls');
-})
-
 //Template rendering
   //Displays the long url and the short url
 app.get("/urls/:shortURL", (req,res) => {
   const user_id = req.session.user_id
   const shortURL = req.params.shortURL
-  
-  let templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlsForUser(user_id, urlDatabase)[shortURL],
-    user: users[user_id]
-  
-  };
 
-  res.render('urls_show', templateVars);
+  //Here we are going to check whether the user id is associated with the url provided
+  
+
+    let templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlsForUser(user_id, urlDatabase)[shortURL],
+      user: users[user_id]
+    }
+    res.render('urls_show', templateVars);
+  
+
+
 })
 
 //This route takes the user to the log in page
@@ -189,6 +136,90 @@ app.get('/register', (req,res) => {
 
   res.render('registration', templateVars);
 })
+
+////// POST REQUEST //////
+  //Post from urls_new's form onto /urls
+  app.post('/urls', (req, res) => {
+    const longURL = req.body.longURL;
+    const shortURL = generateRandomString();
+    const user_id = req.session.user_id
+    
+    
+
+    urlDatabase[shortURL] = {
+      "longURL": longURL,
+      'userID': user_id
+    };
+    res.redirect(`urls/${shortURL}`);
+  })
+
+
+
+
+//This route removes a URL resource from the database
+app.post("/urls/:shortURL/delete", (req,res) => {
+  const user_id = req.session.user_id;
+
+  if(user_id) {
+
+    delete urlDatabase[req.params.shortURL];
+  }
+
+  
+  res.redirect('/urls');
+})
+
+//This route takes the user from url to url/:id through the edit button
+app.post("/urls/:shortURL/", (req,res) => {
+  
+
+
+  res.redirect(`/urls/${req.params.shortURL}`)
+})
+
+//This route edits/updates the longURL & redirects to /urls
+app.post('/urls/:shortURL/edit', (req,res) => {
+  urlDatabase[req.params.shortURL]["longURL"] = req.body.longURL;
+  
+  
+  res.redirect('/urls');
+})
+//This route logs the user and sets the cookie
+app.post('/login', (req,res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const user_id = getKeyByValue(users,email);
+  const currentIdPassword = getUserPassword(user_id,users);
+  
+  
+  
+  
+  if(!user_id) {
+    res.status(403).send('Email cannot be found, please register');
+  }
+
+  if(bcrypt.compareSync(password,currentIdPassword)) {
+    req.session.user_id = user_id;
+    res.redirect('/urls');
+  }
+  
+  else {
+    
+    res.status(403).send('Password is wrong, please try again');
+    
+    
+  }
+  
+})
+
+
+//This route clears the cookie and logs the user out
+app.post('/logout', (req,res) => {
+  res.clearCookie('session');
+  
+  res.redirect('/urls');
+})
+
 
 //This route handles the registration form data
 app.post('/register', (req,res) => {
