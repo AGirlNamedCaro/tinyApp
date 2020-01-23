@@ -87,6 +87,29 @@ app.get("/urls/new", (req,res) => {
     res.render('urls_new', templateVars);
   }
 })
+//Template rendering
+  //Displays the long url and the short url
+app.get("/urls/:shortURL", (req,res) => {
+  const user_id = req.session.user_id
+  const shortURL = req.params.shortURL
+  
+  for(const key in urlDatabase) {
+    if(key === shortURL) {
+      let templateVars = {
+        shortURL: req.params.shortURL,
+        longURL: urlsForUser(user_id, urlDatabase)[shortURL],
+        user: users[user_id]
+      }
+      res.render('urls_show', templateVars);
+      
+    }
+  }
+  res.status(403).send('shortURL id is invalid');
+  
+      
+});
+
+
 //This route will take you to the longURL website upon shortURL click
 app.get("/u/:shortURL", (req,res) => {
 
@@ -94,25 +117,6 @@ app.get("/u/:shortURL", (req,res) => {
   res.redirect(longURL);
 })
 
-//Template rendering
-  //Displays the long url and the short url
-app.get("/urls/:shortURL", (req,res) => {
-  const user_id = req.session.user_id
-  const shortURL = req.params.shortURL
-
-  //Here we are going to check whether the user id is associated with the url provided
-  
-
-    let templateVars = {
-      shortURL: req.params.shortURL,
-      longURL: urlsForUser(user_id, urlDatabase)[shortURL],
-      user: users[user_id]
-    }
-    res.render('urls_show', templateVars);
-  
-
-
-})
 
 //This route takes the user to the log in page
 app.get('/login', (req,res) => {
