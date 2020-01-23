@@ -92,19 +92,22 @@ app.get("/urls/new", (req,res) => {
 app.get("/urls/:shortURL", (req,res) => {
   const user_id = req.session.user_id
   const shortURL = req.params.shortURL
-  
-  for(const key in urlDatabase) {
+ 
+   for(const key in urlDatabase) {
+     
     if(key === shortURL) {
       let templateVars = {
         shortURL: req.params.shortURL,
         longURL: urlsForUser(user_id, urlDatabase)[shortURL],
         user: users[user_id]
       }
-      res.render('urls_show', templateVars);
+       return res.render('urls_show', templateVars);
       
     }
+
+    
   }
-  res.status(403).send('shortURL id is invalid');
+  return res.status(403).send('shortURL id is invalid');
   
       
 });
@@ -138,13 +141,16 @@ app.get('/login', (req,res) => {
 app.get('/register', (req,res) => {
   const user_id = req.session.user_id
 
+  if(user_id) {
+    res.redirect('/urls');
+  }
+  
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     user: users[user_id]
    
   };
-
   res.render('registration', templateVars);
 })
 
@@ -182,10 +188,14 @@ app.post("/urls/:shortURL/delete", (req,res) => {
 
 //This route takes the user from url to url/:id through the edit button
 app.post("/urls/:shortURL/", (req,res) => {
+ 
+      res.redirect(`/urls/${req.params.shortURL}`)
+    
   
 
+  
+  
 
-  res.redirect(`/urls/${req.params.shortURL}`)
 })
 
 //This route edits/updates the longURL & redirects to /urls
@@ -201,10 +211,7 @@ app.post('/login', (req,res) => {
   const password = req.body.password;
   const user_id = getKeyByValue(users,email);
   const currentIdPassword = getUserPassword(user_id,users);
-  
-  
-  
-  
+
   if(!user_id) {
     res.status(403).send('Email cannot be found, please register');
   }
@@ -217,8 +224,7 @@ app.post('/login', (req,res) => {
   else {
     
     res.status(403).send('Password is wrong, please try again');
-    
-    
+
   }
   
 })
