@@ -6,6 +6,7 @@ const { generateRandomString } = require('./functions/generateRandomString')
 const { emailLookUp } = require('./functions/emailLookUp')
 const { getKeyByValue } = require('./functions/getKeyByValue')
 const { getUserPassword } = require('./functions/getUserPassword')
+const { urlsForUser } = require('./functions/urlsForUser')
 
 const cookieParser = require('cookie-parser')
 
@@ -14,8 +15,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
 //Database - start
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 //users start
 const users = { 
@@ -34,9 +35,11 @@ const users = {
 //ROUTES
   //Main URLS page
 app.get("/urls", (req, res) => {
+ 
+  const user_id = req.cookies['user_id'];
+
   let templateVars = { 
-    urls: urlDatabase,
-   
+    urls: urlsForUser(user_id,urlDatabase),
     user: users[req.cookies['user_id']]
     
    };
@@ -46,8 +49,12 @@ app.get("/urls", (req, res) => {
   app.post('/urls', (req, res) => {
     const longURL = req.body.longURL;
     const shortURL = generateRandomString();
+    
 
-    urlDatabase[shortURL] = longURL;
+    urlDatabase[shortURL] = {
+      "longURL": longURL,
+      'userID': req.cookies['user_id']
+    };
     res.redirect(`urls/${shortURL}`);
   })
 //Displays form where the user will submit their long url in order to create a new tiny one
@@ -58,18 +65,30 @@ app.get("/urls/new", (req,res) => {
     user: users[req.cookies['user_id']],
 
   };
+  if(!templateVars['user']) {
+    res.redirect('/login');
+  }
   res.render('urls_new', templateVars);
 })
 
+
+
 //This route will take you to the longURL website upon shortURL click
 app.get("/u/:shortURL", (req,res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+
+  const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 })
 
 //This route removes a URL resource from the database
 app.post("/urls/:shortURL/delete", (req,res) => {
-  delete urlDatabase[req.params.shortURL];
+  const user_id = req.cookies['user_id'];
+  if(user_id) {
+
+    delete urlDatabase[req.params.shortURL];
+  }
+
+  
   res.redirect('/urls');
 })
 
@@ -80,7 +99,14 @@ app.post("/urls/:shortURL/", (req,res) => {
 
 //This route edits/updates the longURL & redirects to /urls
 app.post('/urls/:shortURL/edit', (req,res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+ 
+  
+ 
+
+    urlDatabase[req.params.shortURL] = req.body.longURL;
+  
+
+  
   res.redirect('/urls');
 })
 //This route logs the user and sets the cookie
@@ -121,9 +147,12 @@ app.post('/logout', (req,res) => {
 //Template rendering
   //Displays the long url and the short url
 app.get("/urls/:shortURL", (req,res) => {
+  const user_id = req.cookies['user_id'];
+  const shortURL = req.params.shortURL
+  
   let templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlsForUser(user_id, urlDatabase)[shortURL],
     user: users[req.cookies['user_id']],
   
   };
