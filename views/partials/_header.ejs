@@ -13,7 +13,7 @@
 
     <% if(user){ %>
       <form method="POST" action="/logout" class='form-inline'>
-        <h7>Welcome <%=user.email%>!</h7>
+        <h7 class="nav-item nav-link" style='color: #FFFFFF ;'>Welcome, <%=user.email%>!</h7>
       <button type="submit" class="btn btn-success ml-2">Logout</button>
     </form>
     <% } else{ %> 
