@@ -10,12 +10,10 @@ const { getKeyByValue } = require('./functions/getKeyByValue')
 const { getUserPassword } = require('./functions/getUserPassword')
 const { urlsForUser } = require('./functions/urlsForUser')
 const bcrypt = require('bcrypt');
-//const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-//app.use(cookieParser())
 
 app.use(cookieSession({
   name: 'session',
@@ -92,23 +90,32 @@ app.get("/urls/new", (req,res) => {
 app.get("/urls/:shortURL", (req,res) => {
   const user_id = req.session.user_id
   const shortURL = req.params.shortURL
- 
-   for(const key in urlDatabase) {
-     
-    if(key === shortURL) {
-      let templateVars = {
-        shortURL: req.params.shortURL,
-        longURL: urlsForUser(user_id, urlDatabase)[shortURL],
-        user: users[user_id]
-      }
-       return res.render('urls_show', templateVars);
-      
-    }
 
-    
-  }
-  return res.status(403).send('shortURL id is invalid');
+if(user_id) {
+  if(user_id === urlDatabase[shortURL]['userID']) {
+
+    for(const key in urlDatabase) {
+      
+     if(key === shortURL) {
+       let templateVars = {
+         shortURL: req.params.shortURL,
+         longURL: urlsForUser(user_id, urlDatabase)[shortURL],
+         user: users[user_id]
+       }
+        return res.render('urls_show', templateVars);
+       
+     }
   
+    }
+    return res.status(403).send('shortURL id is invalid');
+  }
+  return res.status(403).send('URL not associated with userID');
+ 
+
+}
+
+  res.redirect('/login');
+
       
 });
 
@@ -139,6 +146,7 @@ app.get('/login', (req,res) => {
 
 //Displays Registration page
 app.get('/register', (req,res) => {
+  
   const user_id = req.session.user_id
 
   if(user_id) {
@@ -216,17 +224,17 @@ app.post('/login', (req,res) => {
   const currentIdPassword = getUserPassword(user_id,users);
 
   if(!user_id) {
-    res.status(403).send('Email cannot be found, please register');
+    return res.status(403).send('Email cannot be found, please register');
   }
 
   if(bcrypt.compareSync(password,currentIdPassword)) {
     req.session.user_id = user_id;
-    res.redirect('/urls');
+    return res.redirect('/urls');
   }
   
   else {
     
-    res.status(403).send('Password is wrong, please try again');
+    return res.status(403).send('Password is wrong, please try again');
 
   }
   
